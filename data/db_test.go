@@ -6,13 +6,23 @@ import (
 	"time"
 )
 
+func TestJsonTime(t *testing.T) {
+	var date string = "2011-01-02T10:02"
+	dateByte := []byte(date)
+	var jt jsonTime
+	err := jt.UnmarshalJSON(dateByte)
+	if err != nil {
+		t.Error(err)
+	}
+	log.Println(jt)
+}
 func TestInsertDoneDelete(t *testing.T) {
 	deadline := time.Date(2021, time.November, 1, 1, 0, 0, 0, time.UTC)
 	task := Task{
 		TaskName: "教科書を買う",
-		Deadline: &deadline,
+		Deadline: jsonTime{deadline},
 		IsDone:   false,
-		DoneTime: nil,
+		DoneTime: TimeZero,
 	}
 
 	// insert
@@ -54,7 +64,7 @@ func TestInsertDoneDelete(t *testing.T) {
 	for i := range tasks {
 		log.Println("donetime", tasks[i].DoneTime)
 		if tasks[i].Id == id {
-			if tasks[i].TaskName != "教科書を買う" || tasks[i].IsDone != true || tasks[i].DoneTime == nil {
+			if tasks[i].TaskName != "教科書を買う" || tasks[i].IsDone != true || tasks[i].DoneTime == TimeZero {
 				log.Println(tasks[i].TaskName)
 				// log.Println(tasks[i].Deadline)
 				log.Println(tasks[i].IsDone)
