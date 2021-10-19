@@ -9,15 +9,15 @@ import (
 )
 
 type Task struct {
-	Id       int      `json:"id"`
-	TaskName string   `json:"taskname"`
-	Deadline JsonTime `json:"deadline"`
-	IsDone   bool     `json:"isdone"`
-	DoneTime JsonTime `json:"donetime"`
+	Id       int       `json:"id"`
+	TaskName string    `json:"taskname"`
+	Deadline *JsonTime `json:"deadline"`
+	IsDone   bool      `json:"isdone"`
+	DoneTime *JsonTime `json:"donetime"`
 }
 
 var Db *sql.DB
-var TimeZero JsonTime
+var TimeZero *JsonTime
 
 // var LOC *time.Location
 
@@ -27,7 +27,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	TimeZero = JsonTime{time.Time{}}
+	TimeZero = &JsonTime{time.Time{}}
 	// LOC, err = time.LoadLocation("Asia/Tokyo")
 	// if err != nil {
 	// 	log.Fatal(err)
@@ -42,7 +42,7 @@ func (task *Task) Insert() (err error) {
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(task.TaskName, task.Deadline.JsonTime, task.IsDone, task.DoneTime.JsonTime).Scan(&task.Id)
+	err = stmt.QueryRow(task.TaskName, task.Deadline.Time, task.IsDone, task.DoneTime.Time).Scan(&task.Id)
 	if err != nil {
 		return
 	}
@@ -69,7 +69,7 @@ func GetAllTask() (alltask []Task, err error) {
 	}
 	for rows.Next() {
 		task := Task{}
-		err = rows.Scan(&task.Id, &task.TaskName, &task.Deadline.JsonTime, &task.IsDone, &task.DoneTime.JsonTime)
+		err = rows.Scan(&task.Id, &task.TaskName, &task.Deadline.Time, &task.IsDone, &task.DoneTime.Time)
 		if err != nil {
 			return
 		}
@@ -87,7 +87,7 @@ func GetDoneTask() (donetask []Task, err error) {
 	}
 	for rows.Next() {
 		task := Task{}
-		err = rows.Scan(&task.Id, &task.TaskName, &task.Deadline.JsonTime, &task.IsDone, &task.DoneTime.JsonTime)
+		err = rows.Scan(&task.Id, &task.TaskName, &task.Deadline.Time, &task.IsDone, &task.DoneTime.Time)
 		if err != nil {
 			return
 		}
@@ -105,7 +105,7 @@ func GetDoingTask() (doingtask []Task, err error) {
 	}
 	for rows.Next() {
 		task := Task{}
-		err = rows.Scan(&task.Id, &task.TaskName, &task.Deadline.JsonTime, &task.IsDone, &task.DoneTime.JsonTime)
+		err = rows.Scan(&task.Id, &task.TaskName, &task.Deadline.Time, &task.IsDone, &task.DoneTime.Time)
 		if err != nil {
 			return
 		}

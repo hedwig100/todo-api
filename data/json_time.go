@@ -5,7 +5,7 @@ import (
 )
 
 type JsonTime struct {
-	JsonTime time.Time
+	time.Time
 }
 
 func (jt *JsonTime) UnmarshalJSON(data []byte) (err error) {
@@ -14,6 +14,6 @@ func (jt *JsonTime) UnmarshalJSON(data []byte) (err error) {
 		return nil
 	}
 
-	jt.JsonTime, err = time.Parse("2006-01-02T15:04", sdata)
+	jt.Time, err = time.Parse("2006-01-02T15:04", sdata)
 	return
 }

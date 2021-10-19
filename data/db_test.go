@@ -20,7 +20,7 @@ func TestInsertDoneDelete(t *testing.T) {
 	deadline := time.Date(2021, time.November, 1, 1, 0, 0, 0, time.UTC)
 	task := Task{
 		TaskName: "教科書を買う",
-		Deadline: JsonTime{deadline},
+		Deadline: &JsonTime{deadline},
 		IsDone:   false,
 		DoneTime: TimeZero,
 	}
