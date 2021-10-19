@@ -9,7 +9,7 @@ import (
 func TestJsonTime(t *testing.T) {
 	var date string = "2011-01-02T10:02"
 	dateByte := []byte(date)
-	var jt jsonTime
+	var jt JsonTime
 	err := jt.UnmarshalJSON(dateByte)
 	if err != nil {
 		t.Error(err)
@@ -20,7 +20,7 @@ func TestInsertDoneDelete(t *testing.T) {
 	deadline := time.Date(2021, time.November, 1, 1, 0, 0, 0, time.UTC)
 	task := Task{
 		TaskName: "教科書を買う",
-		Deadline: jsonTime{deadline},
+		Deadline: JsonTime{deadline},
 		IsDone:   false,
 		DoneTime: TimeZero,
 	}

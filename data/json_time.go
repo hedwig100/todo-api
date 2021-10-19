@@ -4,11 +4,11 @@ import (
 	"time"
 )
 
-type jsonTime struct {
+type JsonTime struct {
 	JsonTime time.Time
 }
 
-func (jt *jsonTime) UnmarshalJSON(data []byte) (err error) {
+func (jt *JsonTime) UnmarshalJSON(data []byte) (err error) {
 	sdata := string(data)
 	if sdata == "null" {
 		return nil

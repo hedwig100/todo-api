@@ -11,13 +11,13 @@ import (
 type Task struct {
 	Id       int      `json:"id"`
 	TaskName string   `json:"taskname"`
-	Deadline jsonTime `json:"deadline"`
+	Deadline JsonTime `json:"deadline"`
 	IsDone   bool     `json:"isdone"`
-	DoneTime jsonTime `json:"donetime"`
+	DoneTime JsonTime `json:"donetime"`
 }
 
 var Db *sql.DB
-var TimeZero jsonTime
+var TimeZero JsonTime
 
 // var LOC *time.Location
 
@@ -27,7 +27,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	TimeZero = jsonTime{time.Time{}}
+	TimeZero = JsonTime{time.Time{}}
 	// LOC, err = time.LoadLocation("Asia/Tokyo")
 	// if err != nil {
 	// 	log.Fatal(err)
