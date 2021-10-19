@@ -18,7 +18,7 @@ var id int
 
 func TestMain(m *testing.M) {
 	setup()
-	id = 33
+	id = 82
 	code := m.Run()
 	os.Exit(code)
 }
@@ -30,8 +30,8 @@ func setup() {
 
 func TestPostTask(t *testing.T) {
 	json := strings.NewReader(`{
-		"taskname":"buy a potate",
-		"deadline":"2021/10/10 21:31:02"
+		"taskname":"buy a tomato",
+		"deadline":"2021-10-10T13:01"
 	}`)
 	request, _ := http.NewRequest("POST", "/task/insert", json)
 	testserver.Handler.ServeHTTP(writer, request)
