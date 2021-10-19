@@ -7,14 +7,24 @@ import (
 	"todo-app/data"
 )
 
+func setCORS(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "http://localhost:8081")
+	(*w).Header().Set("Access-Control-Allow-Headers", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+}
+
 // POST /task/insert/
 func postTask(w http.ResponseWriter, r *http.Request) {
+	setCORS(&w)
+
 	len := r.ContentLength
 	body := make([]byte, len)
 	r.Body.Read(body)
 	var task data.Task
 	json.Unmarshal(body, &task)
+
 	task.IsDone = false
+	task.DoneTime = data.TimeZero
 	err := task.Insert()
 	if err != nil {
 		danger(err, "Cannot insert task")
@@ -24,6 +34,8 @@ func postTask(w http.ResponseWriter, r *http.Request) {
 
 // UPDATE /task/done
 func updateTask(w http.ResponseWriter, r *http.Request) {
+	setCORS(&w)
+
 	r.ParseForm()
 	id, err := strconv.Atoi(r.Form["id"][0])
 	if err != nil {
@@ -38,6 +50,8 @@ func updateTask(w http.ResponseWriter, r *http.Request) {
 
 // DELETE /task/delete
 func deleteTask(w http.ResponseWriter, r *http.Request) {
+	setCORS(&w)
+
 	r.ParseForm()
 	id, err := strconv.Atoi(r.Form["id"][0])
 	if err != nil {
@@ -52,6 +66,8 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
 
 // GET /tasks/all
 func getAllTasks(w http.ResponseWriter, r *http.Request) {
+	setCORS(&w)
+
 	tasks, err := data.GetAllTask()
 	if err != nil {
 		danger(err, "Cannot get all tasks")
@@ -66,6 +82,8 @@ func getAllTasks(w http.ResponseWriter, r *http.Request) {
 
 // GET /tasks/done
 func getDoneTasks(w http.ResponseWriter, r *http.Request) {
+	setCORS(&w)
+
 	tasks, err := data.GetDoneTask()
 	if err != nil {
 		danger(err, "Cannot get done tasks")
@@ -80,6 +98,8 @@ func getDoneTasks(w http.ResponseWriter, r *http.Request) {
 
 // GET /tasks/dogin
 func getDoingTasks(w http.ResponseWriter, r *http.Request) {
+	setCORS(&w)
+
 	tasks, err := data.GetDoingTask()
 	if err != nil {
 		danger(err, "Cannot get doing tasks")
