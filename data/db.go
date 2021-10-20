@@ -9,15 +9,15 @@ import (
 )
 
 type Task struct {
-	Id       int       `json:"id"`
-	TaskName string    `json:"taskname"`
-	Deadline *JsonTime `json:"deadline"`
-	IsDone   bool      `json:"isdone"`
-	DoneTime *JsonTime `json:"donetime"`
+	Id       int      `json:"id"`
+	TaskName string   `json:"taskname"`
+	Deadline JsonTime `json:"deadline"`
+	IsDone   bool     `json:"isdone"`
+	DoneTime JsonTime `json:"donetime"`
 }
 
 var Db *sql.DB
-var TimeZero *JsonTime
+var TimeZero JsonTime
 
 // var LOC *time.Location
 
@@ -27,7 +27,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	TimeZero = &JsonTime{time.Time{}}
+	TimeZero = JsonTime{time.Time{}}
 	// LOC, err = time.LoadLocation("Asia/Tokyo")
 	// if err != nil {
 	// 	log.Fatal(err)

@@ -1,26 +1,26 @@
 package data
 
 import (
+	"encoding/json"
 	"log"
 	"testing"
 	"time"
 )
 
-func TestJsonTime(t *testing.T) {
-	var date string = "2011-01-02T10:02"
-	dateByte := []byte(date)
-	var jt JsonTime
-	err := jt.UnmarshalJSON(dateByte)
-	if err != nil {
-		t.Error(err)
-	}
-	log.Println(jt)
+func TestJsonMarshall(t *testing.T) {
+	var jsonA string = `{
+		"taskname":"buy a tomato",
+		"deadline":"2021-10-10T13:01"
+	}`
+	var task Task
+	json.Unmarshal([]byte(jsonA), &task)
+	log.Println(task)
 }
 func TestInsertDoneDelete(t *testing.T) {
 	deadline := time.Date(2021, time.November, 1, 1, 0, 0, 0, time.UTC)
 	task := Task{
 		TaskName: "教科書を買う",
-		Deadline: &JsonTime{deadline},
+		Deadline: JsonTime{deadline},
 		IsDone:   false,
 		DoneTime: TimeZero,
 	}
