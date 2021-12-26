@@ -15,12 +15,37 @@
     }
     ```
 
-`/users/{username}` <br>
+    - レスポンス
+        - 成功したら201でbodyはなし
+        - 失敗したら500エラー <!--REVIEW: 500エラーでいいか,RFCを読む?-->
+
+        ```
+        {
+            "errorMessage"...,
+        }
+        ```
 
 - DELETE
     - usernameのuserを消す
+    - 要求
 
-`/users/{username}/login` <br> 
+    ```
+    {
+        "username":username
+        "password":password
+    }
+    ```
+
+    - レスポンス
+        - 成功したら200でbodyはなし
+        - 失敗したら500エラー <!--REVIEW: 500エラーでいいか,RFCを読む?-->
+
+        ```
+        {
+            "errorMessage"...,
+        }
+
+`/users/login` <br> 
 
 - POST 
     - ログインできたか
@@ -34,8 +59,8 @@
     ```
 
     - レスポンス
-        - ステータスコード
-        ```
+        - 200でログイン成功
+        - 500でログイン失敗 <!--REVIEW: 500エラーでいいか,RFCを読む?-->
 
 `/users/{username}/task-lists` <br> 
 

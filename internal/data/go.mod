@@ -1,4 +1,4 @@
-module example.com/data
+module github.com/hedwig100/todo-app/internal/data
 
 go 1.16
 
