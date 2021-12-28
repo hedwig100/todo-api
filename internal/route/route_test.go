@@ -14,8 +14,11 @@ import (
 var mux http.ServeMux
 var writer *httptest.ResponseRecorder
 
+// テストデータ
 var createdUsername = []string{"hedwig100", "pokemon", "mac"}
 var createdPassword = []string{"iajgo3o", ")8hgiau", "uhaig1928"}
+var createdTaskListname = []string{"mid-term test", "for presentation", "cooking for chistmas"}
+var createdTaskListId []int
 
 // REVIEW:よりよいテストの仕方,依存性の注入?
 func TestMain(m *testing.M) {
@@ -34,6 +37,15 @@ func setUp() {
 	// テストデータを挿入する
 	for index, username := range createdUsername {
 		data.UserCreate(username, createdPassword[index])
+	}
+	var taskList data.TaskList
+	for index, listname := range createdTaskListname {
+		taskList, _ = data.TaskListCreate(
+			createdUsername[index],
+			"oihgo3",
+			listname,
+		)
+		createdTaskListId[index] = taskList.ListId
 	}
 }
 
@@ -155,11 +167,60 @@ func TestLogin(t *testing.T) {
 }
 
 func TestCreateTaskList(t *testing.T) {
-	t.Skip()
+	// 作成できること
+	json := strings.NewReader(fmt.Sprintf(`{
+		"username": "%s", 
+		"password": "%s",
+		"icon": "add",
+		"listname": "textbooks I want to read"
+	}`, createdUsername[0], createdPassword[0]))
+	request, err := http.NewRequest("POST", "/task-lists/", json)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 201 {
+		t.Error("cannot create task-lists")
+		errMsg := writer.Body.String()
+		t.Error(errMsg)
+	}
+
+	// パスワードが違うと作成できないこと
+	json = strings.NewReader(fmt.Sprintf(`{
+		"username": "%s", 
+		"password": "%s",
+		"icon": "add",
+		"listname": "textbooks I want to read"
+	}`, createdUsername[0], createdPassword[1]))
+	request, err = http.NewRequest("POST", "/task-lists/", json)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 500 {
+		t.Error("can create task-lists although password is not valid")
+	}
 }
 
 func TestGetTaskList(t *testing.T) {
-	t.Skip()
+	// taskをgetできること
+	request, err := http.NewRequest("GET", fmt.Sprintf("/task-lists/%d", createdTaskListId[0]), nil)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 200 {
+		t.Error("cannot get ")
+		errMsg := writer.Body.String()
+		t.Error(errMsg)
+	}
+
 }
 
 func TestUpdateTaskList(t *testing.T) {
@@ -167,5 +228,21 @@ func TestUpdateTaskList(t *testing.T) {
 }
 
 func TestDeleteTaskList(t *testing.T) {
+	t.Skip()
+}
+
+func TestCreateTask(t *testing.T) {
+	t.Skip()
+}
+
+func TestGetTask(t *testing.T) {
+	t.Skip()
+}
+
+func TestUpdateTask(t *testing.T) {
+	t.Skip()
+}
+
+func TestDeleteTask(t *testing.T) {
 	t.Skip()
 }

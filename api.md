@@ -68,7 +68,7 @@
             }
             ```
 
-`/users/{username}/task-lists` <br> 
+`/users/task-lists/{username}` <br> 
 
 - GET
     - usernameのユーザのtaskListsの一覧
