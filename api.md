@@ -6,142 +6,213 @@
 
 - POST
     - ユーザを登録する
-    - 要求
+    - リクエスト
 
-    ```
-    {
-        "username":username, 
-        "password":password
-    }
-    ```
+        ```
+        {
+            "username":username, 
+            "password":password
+        }
+        ```
 
     - レスポンス
         - 成功したら201でbodyはなし
         - 失敗したら500エラー <!--REVIEW: 500エラーでいいか,RFCを読む?-->
 
-        ```
-        {
-            "errorMessage"...,
-        }
-        ```
+            ```
+            {
+                "errorMessage"...,
+            }
+            ```
 
 - DELETE
     - usernameのuserを消す
-    - 要求
+    - リクエスト
 
-    ```
-    {
-        "username":username
-        "password":password
-    }
-    ```
+        ```
+        {
+            "username":username
+            "password":password
+        }
+        ```
 
     - レスポンス
         - 成功したら200でbodyはなし
         - 失敗したら500エラー <!--REVIEW: 500エラーでいいか,RFCを読む?-->
 
-        ```
-        {
-            "errorMessage"...,
-        }
+            ```
+            {
+                "errorMessage"...,
+            }
+            ```
 
 `/users/login` <br> 
 
 - POST 
     - ログインできたか
-    - 要求
+    - リクエスト
 
-    ```
-    {
-        "username":username,
-        "password":password
-    }
-    ```
+        ```
+        {
+            "username":username,
+            "password":password
+        }
+        ```
 
     - レスポンス
-        - 200でログイン成功
+        - 201でログイン成功
         - 500でログイン失敗 <!--REVIEW: 500エラーでいいか,RFCを読む?-->
+            ```
+            {
+                "errorMessage"...,
+            }
+            ```
 
 `/users/{username}/task-lists` <br> 
 
 - GET
     - usernameのユーザのtaskListsの一覧
-    - レスポンス
+    - リクエスト
 
-    ```
-    {
-        "taskLists" [
+        ```
+        {
+            "password": password
+        }
+        ```
+
+    - レスポンス
+        - 成功したらステータスコードは200で以下を返す
+            ```
             {
-                "icon":icon
-                "listname":listname,
-                "listId":listid,
-            },
-            ...
-        ]
-    }
-    ```
+                "taskLists" [
+                    {
+                        "icon":icon
+                        "listname":listname,
+                        "listId":listid,
+                    },
+                    ...
+                ]
+            }
+            ```
+        - 失敗したら500エラー 
+
+            ```
+            {
+                "errorMessage"...,
+            }
+            ```
+
     
 ## task-lists
 
-`/task-lists/`
+`/task-lists`
 
 - POST
     - taskListを作成する
-    - 要求
+    - リクエスト
 
-    ```
-    {
-        "username":username,
-        "icon":icon,
-        "listname":listname,
-    }
-    ```
+        ```
+        {
+            "username":username,
+            "password":password,
+            "icon":icon,
+            "listname":listname,
+        }
+        ```
 
     - レスポンス
-
-    ```
-    {
-        "listId":listid,
-    }
-    ```
+        - 成功したら201をステータスコードとし、listIdを返す
+            ```
+            {
+                "listId":listid,
+            }
+            ```
+        - 失敗したらステータスコードは500とし、エラーを返す
+            ```
+                {
+                    "errorMessage"...,
+                }
+            ```
 
 `/task-lists/{listId}`
 
 - GET
     - listIdのリストを手に入れる
-    - レスポンス
+    - リクエスト
 
-    ```
-    {
-        "username":username,
-        "icon":icon,
-        "listname":listname,
-        "tasks" [
+        ```
+        {
+            "username": username, 
+            "password": password
+        }
+        ```
+
+    - レスポンス
+        - 成功したら200を返して, 以下のようなjsonを返す
+
+            ```
             {
-                "taskname":taskname,
-                "deadline":deadline,
-                "isDone":false,
-                "isImportant":true,
-                "memo":memo
-            },
-            ...
-        ]
-    }
-    ```
+                "username":username,
+                "icon":icon,
+                "listname":listname,
+                "tasks" [
+                    {
+                        "taskname":taskname,
+                        "deadline":deadline,
+                        "isDone":false,
+                        "isImportant":true,
+                        "memo":memo
+                    },
+                    ...
+                ]
+            }
+            ```
+
+        - 失敗したらステータスコードは500とし、エラーを返す
+            ```
+                {
+                    "errorMessage"...,
+                }
+            ```
+
 
 - PUT
     - listIdのリストの更新
-    - 要求
-    ```
-    {
-        "username":username,
-        "icon":icon,
-        "listname":listname,
-    }
-    ```
+    - リクエスト
+        ```
+        {
+            "username":username,
+            "password":password,
+            "icon":icon,
+            "listname":listname,
+        }
+        ```
+    - レスポンス
+        - 成功したら201でボディはなし
+        - 失敗したらステータスコードは500とし、エラーを返す
+            ```
+                {
+                    "errorMessage"...,
+                }
+            ```
 
 - DELETE
     - listIdのリストを消す
+    - リクエスト
+        ```
+        {
+            "username":username,
+            "password":password
+        }
+        ```
+    - レスポンス
+        - 成功したら201でボディはなし
+        - 失敗したらステータスコードは500とし、エラーを返す
+            ```
+                {
+                    "errorMessage"...,
+                }
+            ```
 
 ## tasks  
 
@@ -149,58 +220,100 @@
 
 - POST
     - taskを追加する
-    - 要求
-
-    ```
-    {
-        "username":username,
-        "listId":listid,
-        "taskname":taskname,
-        "deadline":deadline
-    }
-    ```
+    - リクエスト
+        ```
+        {
+            "username":username,
+            "password":password,
+            "listId":listid,
+            "taskname":taskname,
+            "deadline":deadline
+        }
+        ```
 
     - レスポンス
-
-    ```
-    {
-        "taskId":taskid
-    }
-    ```
+        - 成功したら201でtaskIdを返す
+            ```
+            {
+                "taskId":taskid
+            }
+            ```
+        - 失敗したらステータスコードは500とし、エラーを返す
+            ```
+            {
+                "errorMessage"...,
+            }
+            ```
 
 `/tasks/{taskId}` <br>
 
 - GET
     - task_idのtaskの情報を手に入れる
+    - リクエスト
+        ```
+        {
+            "username": username,
+            "password": password 
+        }
+        ```
     - レスポンス
-
-    ```
-    {
-        "username":username,
-        "listId":listid,
-        "taskname":taskname,
-        "deadline":deadline,
-        "isDone":false,
-        "isImportant":true,
-        "memo":memo
-    }
-    ```
+        - 成功したら200で以下を返す
+            ```
+            {
+                "listId":listid,
+                "taskname":taskname,
+                "deadline":deadline,
+                "isDone":false,
+                "isImportant":true,
+                "memo":memo
+            }
+            ```
+        - 失敗したらステータスコードは500とし、エラーを返す
+            ```
+            {
+                "errorMessage"...,
+            }
+            ```
+    
 
 - PUT 
     - task_idのtaskの情報を更新する
-    - 要求
-
-    ```
-    {
-        "username":username,
-        "listId":listid,
-        "taskname":taskname,
-        "deadline":deadline,
-        "isDone":false,
-        "isImportant":true,
-        "memo":memo
-    }
-    ```
+    - リクエスト
+        ```
+        {
+            "username":username,
+            "password":password,
+            "listId":listid,
+            "taskname":taskname,
+            "deadline":deadline,
+            "isDone":false,
+            "isImportant":true,
+            "memo":memo
+        }
+        ```
+    - レスポンス
+        - 成功したら201
+        - 失敗したらステータスコードは500とし、エラーを返す
+            ```
+            {
+                "errorMessage"...,
+            }
+            ```
 
 - DELETE
     - task_idのtaskを消す
+    - リクエスト
+        ```
+        {
+            "username":username,
+            "password":password,
+        }
+        ```
+    - レスポンス
+        - 成功したら201
+        - 失敗したらステータスコードは500とし、エラーを返す
+            ```
+            {
+                "errorMessage"...,
+            }
+            ```
