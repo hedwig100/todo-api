@@ -2,6 +2,7 @@ package route
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -21,6 +22,8 @@ func users(writer http.ResponseWriter, request *http.Request) {
 		err = postUsers(writer, request)
 	case "DELETE":
 		err = deleteUsers(writer, request)
+	default:
+		err = errors.New("this method is not used")
 	}
 
 	if err != nil {
@@ -97,4 +100,10 @@ func loginUsers(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	writer.WriteHeader(201)
+}
+
+// /users/{username}/task-lists
+// GET
+func getUsersTaskLists(writer http.ResponseWriter, request *http.Request) {
+
 }
