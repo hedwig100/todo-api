@@ -196,7 +196,6 @@ func TestGetUsersList(t *testing.T) {
 }
 
 func TestCreateTaskList(t *testing.T) {
-	t.Skip()
 	// 作成できること
 	json := strings.NewReader(fmt.Sprintf(`{
 		"username": "%s", 
@@ -204,7 +203,7 @@ func TestCreateTaskList(t *testing.T) {
 		"icon": "add",
 		"listname": "textbooks I want to read"
 	}`, createdUsername[0], createdPassword[0]))
-	request, err := http.NewRequest("POST", "/task-lists/", json)
+	request, err := http.NewRequest("POST", "/task-lists", json)
 	if err != nil {
 		t.Error(err)
 	}
@@ -224,7 +223,7 @@ func TestCreateTaskList(t *testing.T) {
 		"icon": "add",
 		"listname": "textbooks I want to read"
 	}`, createdUsername[0], createdPassword[1]))
-	request, err = http.NewRequest("POST", "/task-lists/", json)
+	request, err = http.NewRequest("POST", "/task-lists", json)
 	if err != nil {
 		t.Error(err)
 	}
