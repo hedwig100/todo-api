@@ -10,7 +10,7 @@ import (
 )
 
 type UsersJson struct {
-	Username string `json:"username"`
+	Username string `json:"username,omitempty"`
 	Password string `json:"password"`
 }
 
@@ -102,8 +102,52 @@ func loginUsers(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(201)
 }
 
-// /users/{username}/task-lists
+type TaskListResponse struct {
+	TaskLists []data.TaskList `json:"taskLists"`
+}
+
+// /users/task-lists/{username}
 // GET
 func getUsersTaskLists(writer http.ResponseWriter, request *http.Request) {
 
+	// urlからusernameをだす
+	username, err := isCorrectURL("/users/task-lists/", request.URL)
+	if err != nil {
+		sendErrorMessage(writer, err.Error())
+	}
+
+	// read body
+	len := request.ContentLength
+	body := make([]byte, len)
+	_, err = request.Body.Read(body)
+	if err != nil {
+		sendErrorMessage(writer, err.Error())
+		return
+	}
+
+	// read json
+	userJ := UsersJson{}
+	err = json.Unmarshal(body, &userJ)
+	if err != nil {
+		sendErrorMessage(writer, err.Error())
+		return
+	}
+	password := userJ.Password
+
+	// valid password
+	_, success, err := data.Login(username, password)
+	if !success || err != nil {
+		sendErrorMessage(writer, fmt.Sprintf("%s, password is not valid", err.Error()))
+		return
+	}
+
+	// get task-lists
+	taskLists, err := data.UsersTaskLists(username)
+	if err != nil {
+		sendErrorMessage(writer, err.Error())
+		return
+	}
+	body, _ = json.Marshal(TaskListResponse{TaskLists: taskLists})
+	writer.WriteHeader(200)
+	writer.Write(body)
 }
