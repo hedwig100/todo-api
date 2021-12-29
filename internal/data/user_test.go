@@ -1,58 +1,111 @@
 package data
 
 import (
-	"golang.org/x/crypto/bcrypt"
-	"math/rand"
-	"strings"
+	"log"
+	"sort"
 	"testing"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
-const letters = "abcedfghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-const letLen = 62
+// テストデータ
+var createdUsername = []string{"hedwig100", "pokemon", "mac"}
+var createdPassword = []string{"iajgo3o", ")8hgiau", "uhaig1928"}
+var createdTaskListname = []string{"cooking for chistmas", "for presentation", "mid-term test"}
+var createdTaskListId []int
 
-func makeRandomUsername(len int) string {
-	usernameArray := make([]string, len)
-	for i := 0; i < len; i++ {
-		usernameArray[i] = string(letters[rand.Intn(letLen)])
+func TestMain(m *testing.M) {
+	err := setUp()
+	if err != nil {
+		log.Fatal(err)
 	}
-	return strings.Join(usernameArray, "")
+	m.Run()
+}
+
+func setUp() (err error) {
+	// dbの初期化
+	_, err = Db.Exec("DELETE FROM users")
+	if err != nil {
+		return
+	}
+
+	// テストデータ挿入
+	for index, username := range createdUsername {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(createdPassword[index]), 10)
+		if err != nil {
+			return err
+		}
+		Db.Exec("INSERT INTO users (username,password) VALUES ($1,$2)", username, hashedPassword)
+	}
+	createdTaskListId = make([]int, 3)
+	for index, listname := range createdTaskListname {
+		var listId int
+		err = Db.QueryRow(`INSERT INTO task_lists (username,icon,listname) VALUES ($1,'add',$2) RETURNING list_id`,
+			createdUsername[0], listname).Scan(&listId)
+		if err != nil {
+			return
+		}
+		createdTaskListId[index] = listId
+	}
+	return
 }
 
 // REVIEW: よりよいdbまわりのテストの仕方
-func TestUserCRUD(t *testing.T) {
-	username := makeRandomUsername(10)
-	password := "aiueoABCED"
 
-	// create
-	user, err := UserCreate(username, password)
+func TestUserRetrieve(t *testing.T) {
+	user, err := UserRetrieve(createdUsername[0])
 	if err != nil {
 		t.Error(err)
 	}
 
-	flag := bcrypt.CompareHashAndPassword(user.Password, []byte(password))
-	if flag != nil || user.Username != username {
-		t.Fatalf("user: %v", user)
+	err = bcrypt.CompareHashAndPassword(user.Password, []byte(createdPassword[0]))
+	if err != nil || user.Username != createdUsername[0] {
+		t.Error(err)
+		t.Error("username is not correct")
 	}
+}
 
-	// retrive
-	user_db, err := UserRetrieve(username)
+func TestUserCreate(t *testing.T) {
+	_, err := UserCreate("aiueoe", "giohau")
+	if err != nil {
+		t.Error(err)
+	}
+	user, err := UserRetrieve("aiueoe")
 	if err != nil {
 		t.Error(err)
 	}
 
-	flag = bcrypt.CompareHashAndPassword(user_db.Password, []byte(password))
-	if flag != nil || user_db.Uuid != user.Uuid || user_db.Username != user.Username {
-		t.Logf("original_user: %v", user)
-		t.Fatalf("retrieved_user: %v", user_db)
+	err = bcrypt.CompareHashAndPassword(user.Password, []byte("giohau"))
+	if err != nil || user.Username != "aiueoe" {
+		t.Error(err)
+		t.Error("username is not correct")
 	}
+}
 
-	// delete
-	err = UserDelete(username)
+func TestUserDelete(t *testing.T) {
+	err := UserDelete(createdUsername[1])
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = UserRetrieve(username)
+
+	_, err = UserRetrieve(createdUsername[1])
 	if err == nil {
 		t.Error("cannot delete user")
+	}
+}
+
+func TestUsersTaskList(t *testing.T) {
+	taskLists, err := UsersTaskLists(createdUsername[0])
+	if err != nil {
+		t.Error(err)
+	}
+
+	sort.Slice(taskLists, func(i, j int) bool { return taskLists[i].Listname < taskLists[j].Listname })
+	for index, tasklist := range taskLists {
+		if tasklist.ListId != createdTaskListId[index] ||
+			tasklist.Listname != createdTaskListname[index] ||
+			tasklist.Username != createdUsername[0] {
+			t.Error("cannot get user's tasklists")
+		}
 	}
 }

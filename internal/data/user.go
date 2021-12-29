@@ -70,3 +70,28 @@ func Login(username string, password string) (user User, success bool, err error
 	}
 	return
 }
+
+func UsersTaskLists(username string) (taskLists []TaskList, err error) {
+	stmt, err := Db.Prepare("SELECT list_id,icon,listname FROM task_lists WHERE username = $1")
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(username)
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		tasklist := TaskList{Username: username}
+		err = rows.Scan(&tasklist.ListId, &tasklist.Icon, &tasklist.Listname)
+		if err != nil {
+			return
+		}
+		taskLists = append(taskLists, tasklist)
+	}
+
+	err = rows.Err()
+	return
+}
