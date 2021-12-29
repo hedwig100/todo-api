@@ -86,7 +86,8 @@
             {
                 "taskLists" [
                     {
-                        "icon":icon
+                        "username":userrname,
+                        "icon":icon,
                         "listname":listname,
                         "listId":listid,
                     },
