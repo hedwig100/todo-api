@@ -1,8 +1,36 @@
 package data
 
 import (
+	"encoding/json"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
+
+func TestMarshall(t *testing.T) {
+	taskList := TaskList{
+		ListId:   1443,
+		Username: "aiueo",
+		Icon:     "sub",
+		Listname: "aieogb",
+	}
+	jsona, err := json.Marshal(taskList)
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, string(jsona), `{"listId":1443,"username":"aiueo","icon":"sub","listname":"aieogb"}`)
+
+	taskList = TaskList{
+		ListId:   1443,
+		Icon:     "sub",
+		Listname: "aieogb",
+	}
+	jsonb, err := json.Marshal(taskList)
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, string(jsonb), `{"listId":1443,"icon":"sub","listname":"aieogb"}`)
+}
 
 // REVIEW: よりよいdbまわりのテストの仕方,依存をなくす
 func TestTaskListCRUD(t *testing.T) {

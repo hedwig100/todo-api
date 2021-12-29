@@ -1,10 +1,10 @@
 package data
 
 type TaskList struct {
-	ListId   int
-	Username string
-	Icon     string
-	Listname string
+	ListId   int    `json:"listId"`
+	Username string `json:"username,omitempty"`
+	Icon     string `json:"icon"`
+	Listname string `json:"listname"`
 }
 
 func TaskListCreate(username string, icon string, listname string) (taskList TaskList, err error) {
