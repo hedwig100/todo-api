@@ -137,7 +137,7 @@ func getUsersTaskLists(writer http.ResponseWriter, request *http.Request) {
 	// valid password
 	_, success, err := data.Login(username, password)
 	if !success || err != nil {
-		sendErrorMessage(writer, fmt.Sprintf("%s, password is not valid", err.Error()))
+		sendErrorMessage(writer, "password is not valid")
 		return
 	}
 
