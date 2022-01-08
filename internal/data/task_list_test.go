@@ -84,3 +84,26 @@ func TestTaskListCRUD(t *testing.T) {
 		t.Error("cannot delete task_list")
 	}
 }
+
+func TestTaskListAndTasks(t *testing.T) {
+	tasklist, tasks, err := TaskListAndTasks(createdTaskListId[0])
+	if err != nil {
+		t.Error(err)
+	}
+
+	if tasklist.ListId != createdTaskListId[0] || tasklist.Username != createdUsername[0] ||
+		tasklist.Icon != "add" || tasklist.Listname != createdTaskListname[0] {
+		t.Error("tasklist is not correctly retrieved")
+	}
+
+	if len(tasks) != len(createdTaskId) {
+		t.Error("the number of tasks is not correct")
+	}
+
+	for index, task := range tasks {
+		if task.TaskId != createdTaskId[index] || task.Taskname != createdTaskname[index] ||
+			task.IsDone != false || task.IsImportant != false || task.Memo != "" {
+			t.Error("task is not correctly retrived")
+		}
+	}
+}

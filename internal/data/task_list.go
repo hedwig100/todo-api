@@ -57,3 +57,29 @@ func TaskListDelete(listId int) (err error) {
 	_, err = stmt.Exec(listId)
 	return
 }
+
+func TaskListAndTasks(listId int) (tasklist TaskList, tasks []Task, err error) {
+	tasklist, err = TaskListRetrieve(listId)
+	stmt, err := Db.Prepare("SELECT task_id,taskname,deadline,is_done,is_important,memo FROM tasks WHERE list_id = $1")
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(listId)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		task := Task{}
+		err = rows.Scan(&task.TaskId, &task.Taskname, &task.Deadline, &task.IsDone, &task.IsImportant, &task.Memo)
+		if err != nil {
+			return
+		}
+		tasks = append(tasks, task)
+	}
+
+	return
+}
