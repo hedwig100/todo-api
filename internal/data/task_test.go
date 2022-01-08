@@ -7,14 +7,10 @@ import (
 
 // REVIEW: よりよいdbまわりのテストの仕方,依存をなくす
 func TestTaskCRUD(t *testing.T) {
-	t.Skip()
 	username := "hedwig100"
 	taskname := "meet gopher "
 	deadline := time.Date(2021, time.December, 31, 0, 0, 0, 0, time.UTC)
-
-	UserCreate(username, "password")                            // ここではこのエラーは無視(user_testでテストする)
-	taskList, _ := TaskListCreate(username, "icon", "listname") // ここではこのエラーは無視(task_list_testでテストする)
-	listId := taskList.ListId
+	listId := createdTaskListId[1]
 
 	// create
 	task, err := TaskCreate(username, listId, taskname, deadline)
@@ -32,7 +28,7 @@ func TestTaskCRUD(t *testing.T) {
 		t.Error(err)
 	}
 	if taskR.Username != task.Username || taskR.ListId != task.ListId || taskR.Taskname != task.Taskname ||
-		taskR.Deadline != task.Deadline || taskR.IsDone != task.IsDone || taskR.IsImportant != task.IsImportant {
+		!task.Deadline.Equal(taskR.Deadline) || taskR.IsDone != task.IsDone || taskR.IsImportant != task.IsImportant {
 		t.Logf("orginal task: %v", task)
 		t.Fatalf("retrieved task: %v", taskR)
 	}
@@ -49,7 +45,7 @@ func TestTaskCRUD(t *testing.T) {
 		t.Error(err)
 	}
 	if taskR.Username != task.Username || taskR.ListId != task.ListId || taskR.Taskname != task.Taskname ||
-		taskR.Deadline != task.Deadline || taskR.IsDone != task.IsDone || taskR.IsImportant != task.IsImportant {
+		!task.Deadline.Equal(taskR.Deadline) || taskR.IsDone != task.IsDone || taskR.IsImportant != task.IsImportant {
 		t.Logf("orginal task: %v", task)
 		t.Fatalf("retrieved task: %v", taskR)
 	}

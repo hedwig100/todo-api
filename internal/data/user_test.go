@@ -4,6 +4,7 @@ import (
 	"log"
 	"sort"
 	"testing"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -13,6 +14,13 @@ var createdUsername = []string{"hedwig100", "pokemon", "mac"}
 var createdPassword = []string{"iajgo3o", ")8hgiau", "uhaig1928"}
 var createdTaskListname = []string{"cooking for chistmas", "for presentation", "mid-term test"}
 var createdTaskListId []int
+var createdTaskname = []string{"buy a chicken", "buy a present for children", "buy wine"}
+var createdDeadline = []time.Time{
+	time.Date(2022, time.November, 19, 0, 0, 0, 0, time.UTC),
+	time.Date(2022, time.December, 24, 0, 0, 0, 0, time.UTC),
+	time.Date(2022, time.December, 20, 0, 0, 0, 0, time.UTC),
+}
+var createdTaskId []int
 
 func TestMain(m *testing.M) {
 	err := setUp()
@@ -47,6 +55,18 @@ func setUp() (err error) {
 		}
 		createdTaskListId[index] = listId
 	}
+
+	createdTaskId = make([]int, 3)
+	for index, taskname := range createdTaskname {
+		var task_id int
+		err = Db.QueryRow("INSERT INTO tasks (username,list_id,taskname,deadline) VALUES ($1,$2,$3,$4) RETURNING task_id",
+			createdUsername[0], createdTaskListId[0], taskname, createdDeadline[index]).Scan(&task_id)
+		if err != nil {
+			return
+		}
+		createdTaskId[index] = task_id
+	}
+
 	return
 }
 

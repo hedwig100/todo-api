@@ -23,5 +23,5 @@ CREATE TABLE tasks (
     deadline date, 
     is_done boolean DEFAULT false, 
     is_important boolean DEFAULT false,
-    memo text
+    memo text DEFAULT ''
 ); 
