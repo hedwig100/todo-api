@@ -5,14 +5,14 @@ import (
 )
 
 type Task struct {
-	TaskId      int
-	Username    string
-	ListId      int
-	Taskname    string
-	Deadline    time.Time
-	IsDone      bool
-	IsImportant bool
-	Memo        string
+	TaskId      int       `json:"taskId,omitempty"`
+	Username    string    `json:"username,omitempty"`
+	ListId      int       `json:"listId,omitempty"`
+	Taskname    string    `json:"taskname"`
+	Deadline    time.Time `json:"deadline"`
+	IsDone      bool      `json:"isDone"`
+	IsImportant bool      `json:"isImportant"`
+	Memo        string    `json:"memo"`
 }
 
 func TaskCreate(username string, listId int, taskname string, deadline time.Time) (task Task, err error) {

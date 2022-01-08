@@ -3,11 +3,13 @@ package route
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/hedwig100/todo-app/internal/data"
 )
@@ -20,6 +22,13 @@ var createdUsername = []string{"hedwig100", "pokemon", "mac"}
 var createdPassword = []string{"iajgo3o", ")8hgiau", "uhaig1928"}
 var createdTaskListname = []string{"cooking for chistmas", "for presentation", "mid-term test"}
 var createdTaskListId []int
+var createdTaskname = []string{"buy a chicken", "buy a present for children", "buy wine"}
+var createdDeadline = []time.Time{
+	time.Date(2022, time.November, 19, 0, 0, 0, 0, time.UTC),
+	time.Date(2022, time.December, 24, 0, 0, 0, 0, time.UTC),
+	time.Date(2022, time.December, 20, 0, 0, 0, 0, time.UTC),
+}
+var createdTaskId []int
 
 // REVIEW:よりよいテストの仕方,依存性の注入?
 func TestMain(m *testing.M) {
@@ -47,6 +56,20 @@ func setUp() {
 			listname,
 		)
 		createdTaskListId[index] = taskList.ListId
+	}
+
+	createdTaskId = make([]int, 3)
+	for index, taskname := range createdTaskname {
+		task, err := data.TaskCreate(
+			createdUsername[0],
+			createdTaskListId[0],
+			taskname,
+			createdDeadline[index],
+		)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		createdTaskId[index] = task.TaskId
 	}
 }
 
@@ -237,7 +260,11 @@ func TestCreateTaskList(t *testing.T) {
 
 func TestGetTaskList(t *testing.T) {
 	// taskをgetできること
-	request, err := http.NewRequest("GET", fmt.Sprintf("/task-lists/%d", createdTaskListId[0]), nil)
+	json_ := strings.NewReader(fmt.Sprintf(`{
+		"username":"%s",
+		"password":"%s"
+	}`, createdUsername[0], createdPassword[0]))
+	request, err := http.NewRequest("GET", fmt.Sprintf("/task-lists/%d", createdTaskListId[0]), json_)
 	if err != nil {
 		t.Error(err)
 	}
@@ -250,6 +277,29 @@ func TestGetTaskList(t *testing.T) {
 		t.Error(errMsg)
 	}
 
+	var res taskListResponse
+	err = json.Unmarshal(writer.Body.Bytes(), &res)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if res.Username != createdUsername[0] ||
+		res.Icon != "oihgo3" ||
+		res.Listname != createdTaskListname[0] ||
+		len(res.Tasks) != len(createdTaskname) {
+		t.Error("cannot get right task list")
+	}
+
+	for index, task := range res.Tasks {
+		if createdTaskname[index] != task.Taskname ||
+			!createdDeadline[index].Equal(task.Deadline) ||
+			createdTaskId[index] != task.TaskId ||
+			task.IsDone ||
+			task.IsImportant ||
+			task.Memo != "" {
+			t.Error("cannot get right task")
+		}
+	}
 }
 
 func TestUpdateTaskList(t *testing.T) {
