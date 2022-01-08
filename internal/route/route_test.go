@@ -309,7 +309,7 @@ func TestUpdateTaskList(t *testing.T) {
 		"icon":"%s",
 		"listname":"%s"
 	}`, createdUsername[0], createdPassword[0], "sub", "new listname"))
-	request, err := http.NewRequest("PUT", fmt.Sprintf("/task-lists/%d", createdTaskListId[0]), json_)
+	request, err := http.NewRequest("PUT", fmt.Sprintf("/task-lists/%d", createdTaskListId[1]), json_)
 	if err != nil {
 		t.Error(err)
 	}
@@ -322,14 +322,35 @@ func TestUpdateTaskList(t *testing.T) {
 		t.Error(errMsg)
 	}
 
-	tasklist, err := data.TaskListRetrieve(createdTaskListId[0])
+	tasklist, err := data.TaskListRetrieve(createdTaskListId[1])
 	if err != nil || tasklist.Icon != "sub" || tasklist.Listname != "new listname" {
 		t.Error("tasklist is not updated")
 	}
 }
 
 func TestDeleteTaskList(t *testing.T) {
-	t.Skip()
+	json_ := strings.NewReader(fmt.Sprintf(`{
+		"username":"%s",
+		"password":"%s"
+	}`, createdUsername[0], createdPassword[0]))
+	request, err := http.NewRequest("DELETE", fmt.Sprintf("/task-lists/%d", createdTaskListId[1]), json_)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 201 {
+		t.Error("cannot delete ")
+		errMsg := writer.Body.String()
+		t.Error(errMsg)
+	}
+
+	_, err = data.TaskListRetrieve(createdTaskListId[1])
+	if err == nil {
+		t.Error("data hasn't be deleted")
+	}
+	t.Logf("err : %v\n", err.Error())
 }
 
 func TestCreateTask(t *testing.T) {

@@ -187,5 +187,40 @@ func taskListsUpdate(writer http.ResponseWriter, request *http.Request) (err err
 // /task-lists/{listId}
 // DELETE
 func taskListsDelete(writer http.ResponseWriter, request *http.Request) (err error) {
+	// check if correct url is passed
+	traling, err := isCorrectURL("/task-lists/", request.URL)
+	if err != nil {
+		return
+	}
+	listId, err := strconv.Atoi(traling)
+	if err != nil {
+		return
+	}
+
+	// parse json and login
+	len := request.ContentLength
+	body := make([]byte, len)
+	_, err = request.Body.Read(body)
+	if err != nil {
+		return
+	}
+
+	var pwR PwRequest
+	err = json.Unmarshal(body, &pwR)
+	if err != nil {
+		return
+	}
+	if _, success, err := data.Login(pwR.Username, pwR.Password); !success || err != nil {
+		return errors.New("username and password is not valid")
+	}
+
+	// delete
+	err = data.TaskListDelete(listId)
+	if err != nil {
+		return
+	}
+
+	// write
+	writer.WriteHeader(201)
 	return
 }
