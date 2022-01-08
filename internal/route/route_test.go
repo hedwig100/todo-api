@@ -303,7 +303,29 @@ func TestGetTaskList(t *testing.T) {
 }
 
 func TestUpdateTaskList(t *testing.T) {
-	t.Skip()
+	json_ := strings.NewReader(fmt.Sprintf(`{
+		"username":"%s",
+		"password":"%s",
+		"icon":"%s",
+		"listname":"%s"
+	}`, createdUsername[0], createdPassword[0], "sub", "new listname"))
+	request, err := http.NewRequest("PUT", fmt.Sprintf("/task-lists/%d", createdTaskListId[0]), json_)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 201 {
+		t.Error("cannot update ")
+		errMsg := writer.Body.String()
+		t.Error(errMsg)
+	}
+
+	tasklist, err := data.TaskListRetrieve(createdTaskListId[0])
+	if err != nil || tasklist.Icon != "sub" || tasklist.Listname != "new listname" {
+		t.Error("tasklist is not updated")
+	}
 }
 
 func TestDeleteTaskList(t *testing.T) {

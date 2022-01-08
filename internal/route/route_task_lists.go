@@ -131,9 +131,56 @@ func taskListsGet(writer http.ResponseWriter, request *http.Request) (err error)
 	return
 }
 
+type LuRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Icon     string `json:"icon"`
+	Listname string `json:"listname"`
+}
+
 // /task-lists/{listId}
 // PUT
 func taskListsUpdate(writer http.ResponseWriter, request *http.Request) (err error) {
+	// check if correct url is passed
+	traling, err := isCorrectURL("/task-lists/", request.URL)
+	if err != nil {
+		return
+	}
+	listId, err := strconv.Atoi(traling)
+	if err != nil {
+		return
+	}
+
+	// parse json and login
+	len := request.ContentLength
+	body := make([]byte, len)
+	_, err = request.Body.Read(body)
+	if err != nil {
+		return
+	}
+
+	var luR LuRequest
+	err = json.Unmarshal(body, &luR)
+	if err != nil {
+		return
+	}
+	if _, success, err := data.Login(luR.Username, luR.Password); !success || err != nil {
+		return errors.New("username and password is not valid")
+	}
+
+	// update
+	err = data.TaskListUpdate(data.TaskList{
+		ListId:   listId,
+		Username: luR.Username,
+		Icon:     luR.Icon,
+		Listname: luR.Listname,
+	})
+	if err != nil {
+		return
+	}
+
+	// write response
+	writer.WriteHeader(201)
 	return
 }
 
