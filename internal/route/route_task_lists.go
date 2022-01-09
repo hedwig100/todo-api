@@ -71,12 +71,12 @@ func taskListsHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-type PwRequest struct {
+type PwReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-type taskListResponse struct {
+type TlRes struct {
 	Username string      `json:"username"`
 	Icon     string      `json:"icon"`
 	Listname string      `json:"listname"`
@@ -104,7 +104,7 @@ func taskListsGet(writer http.ResponseWriter, request *http.Request) (err error)
 		return
 	}
 
-	var pwR PwRequest
+	var pwR PwReq
 	err = json.Unmarshal(body, &pwR)
 	if err != nil {
 		return
@@ -120,7 +120,7 @@ func taskListsGet(writer http.ResponseWriter, request *http.Request) (err error)
 	}
 
 	// return response
-	body, _ = json.Marshal(taskListResponse{
+	body, _ = json.Marshal(TlRes{
 		Username: tasklist.Username,
 		Icon:     tasklist.Icon,
 		Listname: tasklist.Listname,
@@ -205,7 +205,7 @@ func taskListsDelete(writer http.ResponseWriter, request *http.Request) (err err
 		return
 	}
 
-	var pwR PwRequest
+	var pwR PwReq
 	err = json.Unmarshal(body, &pwR)
 	if err != nil {
 		return

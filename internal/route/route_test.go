@@ -277,7 +277,7 @@ func TestGetTaskList(t *testing.T) {
 		t.Error(errMsg)
 	}
 
-	var res taskListResponse
+	var res TlRes
 	err = json.Unmarshal(writer.Body.Bytes(), &res)
 	if err != nil {
 		t.Error(err)

@@ -97,7 +97,7 @@ func taskGet(writer http.ResponseWriter, request *http.Request) (err error) {
 		return
 	}
 
-	var pwR PwRequest
+	var pwR PwReq
 	err = json.Unmarshal(body, &pwR)
 	if err != nil {
 		return
