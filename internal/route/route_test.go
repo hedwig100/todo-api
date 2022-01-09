@@ -410,7 +410,32 @@ func TestCreateTask(t *testing.T) {
 }
 
 func TestGetTask(t *testing.T) {
-	t.Skip()
+	json_ := strings.NewReader(fmt.Sprintf(`{
+		"username":"%s",
+		"password":"%s"
+	}`, createdUsername[0], createdPassword[0]))
+	request, err := http.NewRequest("GET", fmt.Sprintf("/tasks/%d", createdTaskId[0]), json_)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 200 {
+		t.Error("task has not been fetched")
+		errMsg := writer.Body.String()
+		t.Error(errMsg)
+	}
+
+	var task data.Task
+	err = json.Unmarshal(writer.Body.Bytes(), &task)
+	if err != nil {
+		return
+	}
+	if task.ListId != createdTaskListId[0] || task.Taskname != createdTaskname[0] ||
+		task.Deadline != createdDeadline[0] || task.IsDone || task.IsImportant || task.Memo != "" {
+		t.Error("task has not correctly been fetched")
+	}
 }
 
 func TestUpdateTask(t *testing.T) {

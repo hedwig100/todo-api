@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/hedwig100/todo-app/internal/data"
@@ -74,6 +75,43 @@ func taskHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func taskGet(writer http.ResponseWriter, request *http.Request) (err error) {
+	// check if correct url is passed
+	traling, err := isCorrectURL("/tasks/", request.URL)
+	if err != nil {
+		return
+	}
+	taskId, err := strconv.Atoi(traling)
+	if err != nil {
+		return
+	}
+
+	// parse json and login
+	len := request.ContentLength
+	body := make([]byte, len)
+	_, err = request.Body.Read(body)
+	if err != nil {
+		return
+	}
+
+	var pwR PwRequest
+	err = json.Unmarshal(body, &pwR)
+	if err != nil {
+		return
+	}
+	if _, success, err := data.Login(pwR.Username, pwR.Password); !success || err != nil {
+		return errors.New("username and password is not valid")
+	}
+
+	// get task
+	task, err := data.TaskRetrieve(taskId)
+	if err != nil {
+		return
+	}
+
+	// return response
+	body, _ = json.Marshal(task)
+	writer.WriteHeader(200)
+	writer.Write(body)
 	return
 }
 
