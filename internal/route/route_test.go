@@ -478,5 +478,26 @@ func TestUpdateTask(t *testing.T) {
 }
 
 func TestDeleteTask(t *testing.T) {
-	t.Skip()
+	json_ := strings.NewReader(fmt.Sprintf(`{
+		"username":"%s",
+		"password":"%s"
+	}`, createdUsername[0], createdPassword[0]))
+	request, err := http.NewRequest("DELETE", fmt.Sprintf("/tasks/%d", createdTaskId[1]), json_)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 201 {
+		t.Error("task has not been deleted")
+		errMsg := writer.Body.String()
+		t.Error(errMsg)
+	}
+
+	// check if task is correctly deleted
+	_, err = data.TaskRetrieve(createdTaskId[1])
+	if err == nil {
+		t.Error("task has not correctly been deleted")
+	}
 }
