@@ -350,11 +350,63 @@ func TestDeleteTaskList(t *testing.T) {
 	if err == nil {
 		t.Error("data hasn't be deleted")
 	}
-	t.Logf("err : %v\n", err.Error())
+	t.Logf("%v\n", err.Error())
+}
+
+type Response1 struct {
+	TaskId int `json:"taskId"`
 }
 
 func TestCreateTask(t *testing.T) {
-	t.Skip()
+	// タスクが作成できる。
+	taskname := "task1"
+	deadline := time.Date(2021, time.November, 10, 0, 0, 0, 0, time.UTC)
+	json_ := strings.NewReader(fmt.Sprintf(`{
+		"username":"%s",
+		"password":"%s",
+		"listId":%d,
+		"taskname":"%s",
+		"deadline":"%s"
+	}`, createdUsername[0], createdPassword[0], createdTaskListId[0], taskname, deadline.Format(time.RFC3339)))
+	request, err := http.NewRequest("POST", "/tasks", json_)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 201 {
+		t.Error("task has not been created")
+		errMsg := writer.Body.String()
+		t.Error(errMsg)
+	}
+
+	var res Response1
+	err = json.Unmarshal(writer.Body.Bytes(), &res)
+	if err != nil {
+		return
+	}
+
+	// listIdが異なるタスクが作成できない。
+	taskname = "task1"
+	deadline = time.Date(2021, time.November, 10, 0, 0, 0, 0, time.UTC)
+	json_ = strings.NewReader(fmt.Sprintf(`{
+		"username":"%s",
+		"password":"%s",
+		"listId":19834,
+		"taskname":"%s",
+		"deadline":"%s"
+	}`, createdUsername[0], createdPassword[0], taskname, deadline.Format(time.RFC3339)))
+	request, err = http.NewRequest("POST", "/tasks", json_)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 500 {
+		t.Error("task has been inserted although listId is not there")
+	}
 }
 
 func TestGetTask(t *testing.T) {
