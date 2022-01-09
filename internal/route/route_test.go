@@ -439,7 +439,42 @@ func TestGetTask(t *testing.T) {
 }
 
 func TestUpdateTask(t *testing.T) {
-	t.Skip()
+	newTaskname := "new task name"
+	newDeadline := time.Date(2022, time.April, 10, 0, 0, 0, 0, time.UTC)
+	newMemo := "aiueo kkkkk"
+	json_ := strings.NewReader(fmt.Sprintf(`{
+		"username":"%s",
+		"password":"%s",
+		"listId":%d,
+		"taskname":"%s",
+		"deadline":"%s",
+		"isDone":%s,
+		"isImportant":%s, 
+		"memo":"%s"
+	}`, createdUsername[0], createdPassword[0], createdTaskListId[0], newTaskname, newDeadline.Format(time.RFC3339), "true", "true", newMemo))
+	request, err := http.NewRequest("PUT", fmt.Sprintf("/tasks/%d", createdTaskId[1]), json_)
+	if err != nil {
+		t.Error(err)
+	}
+	writer = httptest.NewRecorder()
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 201 {
+		t.Error("task has not been updated")
+		errMsg := writer.Body.String()
+		t.Error(errMsg)
+	}
+
+	// check if task is updated
+	task, err := data.TaskRetrieve(createdTaskId[1])
+	if err != nil {
+		t.Error(err)
+	}
+	if task.ListId != createdTaskListId[0] || task.Taskname != newTaskname ||
+		!task.Deadline.Equal(newDeadline) || !task.IsDone || !task.IsImportant || task.Memo != newMemo {
+		t.Log(task)
+		t.Error("task has not correctly been updated")
+	}
 }
 
 func TestDeleteTask(t *testing.T) {

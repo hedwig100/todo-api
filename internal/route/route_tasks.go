@@ -22,6 +22,8 @@ type TcRes struct {
 	TaskId int `json:"taskId"`
 }
 
+// /tasks
+// POST
 func taskCreate(writer http.ResponseWriter, request *http.Request) {
 	// read json
 	len := request.ContentLength
@@ -74,6 +76,8 @@ func taskHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// /tasks/{taskId}
+// GET
 func taskGet(writer http.ResponseWriter, request *http.Request) (err error) {
 	// check if correct url is passed
 	traling, err := isCorrectURL("/tasks/", request.URL)
@@ -115,7 +119,64 @@ func taskGet(writer http.ResponseWriter, request *http.Request) (err error) {
 	return
 }
 
+type TuReq struct {
+	Username    string    `json:"username"`
+	Password    string    `json:"password"`
+	ListId      int       `json:"listId"`
+	Taskname    string    `json:"taskname"`
+	Deadline    time.Time `json:"deadline"`
+	IsDone      bool      `json:"isDone"`
+	IsImportant bool      `json:"isImportant"`
+	Memo        string    `json:"memo"`
+}
+
+// /tasks/{taskId}
+// PUT
 func taskUpdate(writer http.ResponseWriter, request *http.Request) (err error) {
+	// check if correct url is passed
+	traling, err := isCorrectURL("/tasks/", request.URL)
+	if err != nil {
+		return
+	}
+	taskId, err := strconv.Atoi(traling)
+	if err != nil {
+		return
+	}
+
+	// parse json and login
+	len := request.ContentLength
+	body := make([]byte, len)
+	_, err = request.Body.Read(body)
+	if err != nil {
+		return
+	}
+
+	var tuR TuReq
+	err = json.Unmarshal(body, &tuR)
+	if err != nil {
+		return
+	}
+	if _, success, err := data.Login(tuR.Username, tuR.Password); !success || err != nil {
+		return errors.New("username and password is not valid")
+	}
+
+	// update task
+	err = data.TaskUpdate(data.Task{
+		TaskId:      taskId,
+		Username:    tuR.Username,
+		ListId:      tuR.ListId,
+		Taskname:    tuR.Taskname,
+		Deadline:    tuR.Deadline,
+		IsDone:      tuR.IsDone,
+		IsImportant: tuR.IsImportant,
+		Memo:        tuR.Memo,
+	})
+	if err != nil {
+		return
+	}
+
+	// return response
+	writer.WriteHeader(201)
 	return
 }
 
