@@ -1,4 +1,4 @@
-module github.com/hedwig100/todo-app/cmd/main
+module github.com/hedwig100/todo-app/cmd/app
 
 go 1.16
 
