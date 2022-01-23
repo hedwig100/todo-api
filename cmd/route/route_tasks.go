@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hedwig100/todo-app/internal/data"
+	"github.com/hedwig100/todo-api/cmd/data"
 )
 
 type TcReq struct {

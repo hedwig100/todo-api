@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hedwig100/todo-app/internal/data"
+	"github.com/hedwig100/todo-api/cmd/data"
 )
 
 var mux http.ServeMux

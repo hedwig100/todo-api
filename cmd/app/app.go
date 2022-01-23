@@ -3,7 +3,7 @@ package app
 import (
 	"net/http"
 
-	"github.com/hedwig100/todo-app/internal/route"
+	"github.com/hedwig100/todo-api/cmd/route"
 )
 
 func GetServer() (server *http.Server) {

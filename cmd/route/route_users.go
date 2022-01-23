@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hedwig100/todo-app/internal/data"
+	"github.com/hedwig100/todo-api/cmd/data"
 )
 
 type UsersJson struct {

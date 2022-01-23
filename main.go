@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/hedwig100/todo-app/cmd/app"
+	"github.com/hedwig100/todo-api/cmd/app"
 )
 
 func main() {

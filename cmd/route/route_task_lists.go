@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/hedwig100/todo-app/internal/data"
+	"github.com/hedwig100/todo-api/cmd/data"
 )
 
 // REVIEW:json.Marshalなどを使わずにjson化する
