@@ -2,3 +2,5 @@
 .vscode
 design.md
 todo-app
+todo-app.code-workspace
+cmd/main/main
